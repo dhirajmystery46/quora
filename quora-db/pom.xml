@@ -93,7 +93,7 @@
     <profiles>
         <!-- database setup -->
         <profile>
-            <id>setup</id>
+            <id>dbsetup</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>

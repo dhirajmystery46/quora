@@ -4,6 +4,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -12,25 +14,27 @@ import java.io.Serializable;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "user_auth", schema = "quora")
+@Table(name = "user_auth")
 @NamedQueries({
-        @NamedQuery(name = "userAuthTokenByAccessToken" , query = "select ut from UserAuthTokenEntity ut where ut.accessToken = :accessToken ")
+        @NamedQuery(name = "userAuthTokenByAccessToken", query = "select ut from UserAuthTokenEntity ut where ut.accessToken = :accessToken "),
+        @NamedQuery(name="UserByUserUuid",query ="select ut from UserAuthTokenEntity ut where ut.id =:uuid"),
+        @NamedQuery(name="userAuthTokenByUuid",query="select ut from UserAuthTokenEntity ut where ut.uuid = :uuid")
 })
 public class UserAuthTokenEntity implements Serializable {
-
 
     @Id
     @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "UUID")
+    @Size(max = 200)
+    private String uuid;
+
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "USER_ID")
     private UserEntity user;
-
-    @Column(name = "UUID")
-    @Size(max = 64)
-    private String uuid;
 
     @Column(name = "ACCESS_TOKEN")
     @NotNull
@@ -48,13 +52,20 @@ public class UserAuthTokenEntity implements Serializable {
     @Column(name = "LOGOUT_AT")
     private ZonedDateTime logoutAt;
 
-
     public Integer getId() {
         return id;
     }
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public UserEntity getUser() {
@@ -97,8 +108,6 @@ public class UserAuthTokenEntity implements Serializable {
         this.logoutAt = logoutAt;
     }
 
-
-
     @Override
     public boolean equals(Object obj) {
         return new EqualsBuilder().append(this, obj).isEquals();
@@ -114,4 +123,3 @@ public class UserAuthTokenEntity implements Serializable {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
     }
 }
-
