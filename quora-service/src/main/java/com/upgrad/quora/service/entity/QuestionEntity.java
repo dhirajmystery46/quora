@@ -13,74 +13,79 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 
-
 @Entity
-@Table(name = "question", schema = "quora")
+@Table(name = "question")
+@NamedQueries({
+        @NamedQuery(name = "questionByQUuid", query = "select q from QuestionEntity q where q.uuid =:uuid"),
+        @NamedQuery(name= "allQuestionsByUserId",query = "select qe from QuestionEntity qe inner join qe.user usr where usr.uuid = :uuid"),
+        @NamedQuery(name= "allQuestions",query = "select q from QuestionEntity q "),
+        @NamedQuery(name= "questionById",query = "select q from QuestionEntity q where q.uuid = :uuid")
+
+})
 public class QuestionEntity implements Serializable {
 
     @Id
-    @Column(name = "id")
+    @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "UUID")
-    @NotNull
-    @Size(max = 64)
+    @Size(max = 200)
     private String uuid;
 
-    @Column(name = "content")
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "USER_ID")
+    private UserEntity user;
+
+    @Column(name = "CONTENT")
     @NotNull
+    @Size(max = 500)
     private String content;
 
-    @Column(name = "date")
+    @Column(name = "DATE")
     @NotNull
     private ZonedDateTime date;
 
-    public Integer getId () {
+    public Integer getId() {
         return id;
     }
 
-    public void setId (Integer id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public String getUuid () {
+    public String getUuid() {
         return uuid;
     }
 
-    public void setUuid (String uuid) {
+    public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 
-    public String getContent () {
-        return content;
-    }
-
-    public void setContent (String content) {
-        this.content = content;
-    }
-
-    public ZonedDateTime getDate () {
-        return date;
-    }
-
-    public void setDate (ZonedDateTime date) {
-        this.date = date;
-    }
-
-    public UserEntity getUser () {
+    public UserEntity getUser() {
         return user;
     }
 
-    public void setUser (UserEntity user) {
+    public void setUser(UserEntity user) {
         this.user = user;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "USER_ID")
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private UserEntity user;
+    public String getContent() {
+        return content;
+    }
 
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public ZonedDateTime getDate() {
+        return date;
+    }
+
+    public void setDate(ZonedDateTime date) {
+        this.date = date;
+    }
     @Override
     public boolean equals(Object obj) {
         return new EqualsBuilder().append(this, obj).isEquals();
@@ -95,6 +100,4 @@ public class QuestionEntity implements Serializable {
     public String toString() {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
     }
-
-
 }
